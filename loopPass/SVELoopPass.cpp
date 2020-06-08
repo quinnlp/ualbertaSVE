@@ -34,21 +34,32 @@ namespace {
   bool SVELoopPass::runOnLoop(Loop *L, LPPassManager &LPM) {
 
     bool is_innermost = true;
+    bool has_controlflow = false;
     for (Loop *loop : L->getLoopsInPreorder()) {
       if (loop != L) {                   // contains another loop
         is_innermost = false;
         break;
       }
     }
+    DominatorTree &DT = LPM.getAnalysis<DominatorTreeWrapperPass>().getDomTree();
     if (is_innermost) {                  // is an innermost loop
-      for (BasicBlock *block : L->getBlocks()) {
-        DominatorTree &DT = LPM.getAnalysis<DominatorTreeWrapperPass>().getDomTree();
-        //SmallVector<BasicBlock *, 100> Result;
-        //DT.getDescendants(block, Result);
-        //for (BasicBlock *block : L->getBlocks()) {}
+      for (BasicBlock *B : L->getBlocks()) {
+        //errs() << "Checking " << B->front().getDebugLoc().getLine() << '\n';
+        for (BasicBlock *P : predecessors(B)) {
+          //errs() << "Does " << P->front().getDebugLoc().getLine() << " dominate " << B->front().getDebugLoc().getLine() << "? ";
+          if (!DT.dominates(P, B) && L->contains(P)) {
+            has_controlflow = true;
+            //errs() << "no\n";
+          } else{
+            //errs() << "yes\n";
+          }
+        }
       }
-      errs()  << "Line #" << L->getLocRange().getStart()->getLine() << "\t# Blocks: " << L->getNumBlocks() <<'\n';
+      if (has_controlflow) {
+        errs()  << "Line #" << L->getLocRange().getStart()->getLine() << "\t# Blocks: " << L->getNumBlocks() <<'\n';
+      }
     }
+    
     return false;
   }
 
