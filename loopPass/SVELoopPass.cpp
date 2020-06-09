@@ -32,12 +32,13 @@ namespace {
   };
 
   bool SVELoopPass::runOnLoop(Loop *L, LPPassManager &LPM) {
-
     bool is_innermost = true;
     bool has_controlflow = false;
-    for (Loop *loop : L->getLoopsInPreorder()) {
+    //errs()  << "Looking at Line #" << L->getLocRange().getStart()->getLine() << '\n';
+    for (Loop *loop : L->getSubLoops()) {
       if (loop != L) {                   // contains another loop
         is_innermost = false;
+        //errs()  << "Killed with Line #" << loop->getLocRange().getStart()->getLine() << '\n';
         break;
       }
     }
@@ -56,10 +57,9 @@ namespace {
         }
       }
       if (has_controlflow) {
-        errs()  << "Line #" << L->getLocRange().getStart()->getLine() << "\t# Blocks: " << L->getNumBlocks() <<'\n';
+        errs()  << "Line #" << L->getLocRange().getStart()->getLine() << '\n';
       }
     }
-    
     return false;
   }
 
