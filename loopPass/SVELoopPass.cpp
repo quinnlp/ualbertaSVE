@@ -47,7 +47,7 @@ namespace {
         //errs() << "Checking " << B->front().getDebugLoc().getLine() << '\n';
         for (BasicBlock *P : predecessors(B)) {
           //errs() << "Does " << P->front().getDebugLoc().getLine() << " dominate " << B->front().getDebugLoc().getLine() << "? ";
-          if (!DT.dominates(P, B) && L->contains(P)) {
+          if (!DT.dominates(P, B) && L->contains(P) && B != L->getHeader()) {
             has_controlflow = true;
             //errs() << "no\n";
           } else{
