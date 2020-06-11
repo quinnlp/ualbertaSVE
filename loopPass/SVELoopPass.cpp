@@ -35,10 +35,10 @@ namespace {
     bool is_innermost = true;
     bool has_controlflow = false;
     //errs()  << "Looking at Line #" << L->getLocRange().getStart()->getLine() << '\n';
-    for (Loop *loop : L->getSubLoops()) {
+    for (Loop *loop : L->getLoopsInPreorder()) {
       if (loop != L) {                   // contains another loop
         is_innermost = false;
-        //errs()  << "Killed with Line #" << loop->getLocRange().getStart()->getLine() << '\n';
+        //errs()  << "    Killed with Line #" << loop->getLocRange().getStart()->getLine() << '\n';
         break;
       }
     }
@@ -47,7 +47,7 @@ namespace {
       for (BasicBlock *B : L->getBlocks()) {
         //errs() << "Checking " << B->front().getDebugLoc().getLine() << '\n';
         for (BasicBlock *P : predecessors(B)) {
-          //errs() << "Does " << P->front().getDebugLoc().getLine() << " dominate " << B->front().getDebugLoc().getLine() << "? ";
+          //errs() << "   Does " << P->front().getDebugLoc().getLine() << " dominate " << B->front().getDebugLoc().getLine() << "? ";
           if (!DT.dominates(P, B) && L->contains(P) && B != L->getHeader()) {
             has_controlflow = true;
             //errs() << "no\n";
