@@ -33,7 +33,7 @@ namespace {
 
   bool SVELoopPass::runOnLoop(Loop *L, LPPassManager &LPM) {
     bool is_innermost = true;
-    bool has_controlflow = false;
+    bool has_controlflow = true;      // TO CATCH CONTROL FLOW ONLY switch to false and uncomment lines 47-58
     //errs()  << "Looking at Line #" << L->getLocRange().getStart()->getLine() << '\n';
     for (Loop *loop : L->getLoopsInPreorder()) {
       if (loop != L) {                   // contains another loop
@@ -44,7 +44,7 @@ namespace {
     }
     DominatorTree &DT = LPM.getAnalysis<DominatorTreeWrapperPass>().getDomTree();
     if (is_innermost) {                  // is an innermost loop
-      for (BasicBlock *B : L->getBlocks()) {
+/*      for (BasicBlock *B : L->getBlocks()) {
         //errs() << "Checking " << B->front().getDebugLoc().getLine() << '\n';
         for (BasicBlock *P : predecessors(B)) {
           //errs() << "   Does " << P->front().getDebugLoc().getLine() << " dominate " << B->front().getDebugLoc().getLine() << "? ";
@@ -55,9 +55,9 @@ namespace {
             //errs() << "yes\n";
           }
         }
-      }
+      }*/
       if (has_controlflow) {
-        errs()  << "Line #" << L->getLocRange().getStart()->getLine() << '\n';
+        errs() << L->getLocRange().getStart()->getLine() << '\n';
       }
     }
     return false;
