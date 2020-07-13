@@ -22,7 +22,7 @@ rm -f ${1%.c}-temp.bc ${1%.c}.bc                                        # remove
 
 # PROFILING
 clang -g -fprofile-instr-generate=./${1%.c}.prof -fcoverage-mapping $1 -Wall -o ${1%.c}     # compile the test with llvm profiling enabled
-./${1%.c} &> /dev/null                                                                      # run the compiled file
+./${1%.c}                                                                   # run the compiled file
 llvm-profdata merge -output=${1%.c}.merge -instr ./${1%.c}.prof                             # merge profiling data
 llvm-cov show ${1%.c} -instr-profile=${1%.c}.merge > ${1%.c}.full                           # show profiling stuff
 echo " LINE|  COUNT|"
@@ -30,4 +30,4 @@ while read line
 do 
     sed -n $line'p' < ${1%.c}.full 
 done < ${1%.c}.lines
-rm -f ${1%.c} ${1%.c}.merge ${1%.c}.prof ${1%.c}.full ${1%.c}.lines                         # remove files     
+rm -rf ${1%.c} ${1%.c}.merge ${1%.c}.prof ${1%.c}.full ${1%.c}.lines ${1%.c}.dSYM                        # remove files     
